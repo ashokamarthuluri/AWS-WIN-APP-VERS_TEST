@@ -1,4 +1,6 @@
+import logging
 import boto3
+from botocore.exceptions import WaiterError
 import time
 
 ec2 = boto3.resource('ec2', region_name='us-east-1')
@@ -26,11 +28,20 @@ response = ssm_client.send_command(
 )
 
 command_id = response['Command']['CommandId']
-output = ssm_client.get_command_invocation(
-    CommandId = command_id,
-    InstanceId = 'i-0533ec91ec7a77f25',
-)
-time.sleep(5)
+# output = ssm_client.get_command_invocation(
+#     CommandId = command_id,
+#     InstanceId = 'i-0533ec91ec7a77f25',
+# )
+waiter = ssm_client.get_waiter("command_executed")
+try:
+    waiter.wait(
+        CommandId = command_id,
+        InstanceId = 'i-0533ec91ec7a77f25',
+    )
+except WaiterError as ex:
+    logging.error(ex)
+
+# time.sleep(20)
 # print(output)
 
 #Retreving the Output and printing the Output form S3 bucket.
