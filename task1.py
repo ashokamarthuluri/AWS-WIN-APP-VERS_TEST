@@ -35,7 +35,7 @@ waiter = ssm_client.get_waiter("command_executed")
 try:
     waiter.wait(
         CommandId = command_id,
-        InstanceIds = win_ec2_list
+        InstanceId = win_ec2_list
     )
 except WaiterError as ex:
     logging.error(ex)
