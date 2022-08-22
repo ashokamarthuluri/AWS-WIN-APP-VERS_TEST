@@ -1,7 +1,6 @@
 import logging
 import boto3
 from botocore.exceptions import WaiterError
-import time
 
 ec2 = boto3.resource('ec2', region_name='us-east-1')
 
@@ -36,7 +35,7 @@ waiter = ssm_client.get_waiter("command_executed")
 try:
     waiter.wait(
         CommandId = command_id,
-        InstanceId = 'i-0533ec91ec7a77f25',
+        InstanceIds = win_ec2_list
     )
 except WaiterError as ex:
     logging.error(ex)
@@ -48,5 +47,8 @@ except WaiterError as ex:
 s3_res = boto3.resource('s3',region_name='us-east-1')
 my_bucket = s3_res.Bucket('ssmbucketfortst')
 
+my_bucket_list = []
 for i in my_bucket.objects.all():
-    print(i.get()['Body'].read())
+    my_bucket_list.append(i)
+
+print(my_bucket_list[-1].get()['Body'].read())
